@@ -23,7 +23,7 @@ First we want to read and join the data for the first 7 waves of the Understandi
 
 The only thing you need to do for this code to work on your computer is to provide a path to the directory where the data are stored on your computer.
 
-```{r}
+```{r} 
 library(tidyverse)
 library(data.table)
 
@@ -33,7 +33,7 @@ library(data.table)
 
 files <- dir(
              # Select the folder where the files are stored.
-             "[add your path here]",
+             "~/Downloads/UKDA-6614-tab/tab",
              # Tell R which pattern you want present in the files it will display.
              pattern = "indresp",
              # We want this process to repeat through the entire folder.
@@ -74,7 +74,9 @@ Now we have got the data from all 7 waves in the same data frame **all7** in the
 
 ```{r}
 Long <- all7 %>%
-  ...
+  pivot_longer(a_memorig:g_vote6, names_to = "variable", values_to = "value") %>%
+  separate(variable, into = c("wave", "variable"), sep = "_", extra = "merge") %>%
+  pivot_wider(names_from = variable, values_from = value)
 Long
 ```
 
@@ -84,9 +86,13 @@ Now we want to filter the data keeping only respondents from the original UKHLS 
 
 ```{r}
 Long <- Long %>%
-        filter(...) %>%
-        mutate(sex_dv = ...) %>%
-        mutate(vote6 = ...)
+        filter(memorig == 1) %>%
+        mutate(sex_dv = ifelse(sex_dv == 1, "male",
+                                   ifelse(sex_dv == 2, "female", NA))) %>%
+        mutate(vote6 = case_when(
+          vote6 == -7 ~ NA_character_ 
+          
+        ))
 
 Long %>%
         ...
